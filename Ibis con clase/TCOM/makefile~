@@ -1,0 +1,5 @@
+COMP	= mpicc
+OPT     = -O3 -w 
+all: tcom
+anillo: tcom.c
+	$(COMP)  $(OPT)  -o $@ $@.c -lm

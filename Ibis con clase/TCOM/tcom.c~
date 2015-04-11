@@ -1,0 +1,127 @@
+//mpicc -O3 -w -o tcom tcom.c -lm
+#include <math.h>
+#include <stdio.h>
+#include <mpi.h>
+
+int main(int argc, char **argv)
+{
+	
+	int myrank, numprocs,numit,i,valido = 0, operacion = 0,init = 0;
+	char name[MPI_MAX_PROCESSOR_NAME],dato='\0';
+	double start_time, end_time, t_beta=0.0,t_tau = 0.0,t_comm,tam,expo,mensaje; 
+
+	
+	
+
+	MPI_Status estado; 
+	MPI_Init(&argc,&argv);
+	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
+
+if(init == 0 && myrank == 0) // inicializamos los datos necesarios para las operaciones
+{
+
+	printf("Numero de iteraciones para realizar la prueba: 100\n");
+
+	printf("Tamaño de mensaje (256bytes - 4MB => 2^5 - 2^19):\n");
+	
+	
+	expo = 5000;
+	numit = 1000;
+	mensaje = pow(2,expo);
+	printf("%f\n",mensaje);
+	init = 1;
+}
+//Calculamos beta
+
+if (operacion == 0)
+{
+
+	if (myrank == 0)
+	{
+
+		
+	
+
+		for (i = 0; i < numit; i++)
+		{
+
+		start_time = MPI_Wtime();
+				MPI_Send(&dato,1,MPI_BYTE,1,8,MPI_COMM_WORLD);
+				MPI_Recv(&dato,1,MPI_BYTE,1,8,MPI_COMM_WORLD,&estado);
+
+		
+
+		
+		
+		}
+		end_time = MPI_Wtime();	
+		t_beta = (end_time - start_time)/(2 * numit);
+	
+	}
+		
+	
+	else
+	{
+		for (i = 0; i < numit; i++)
+		{
+			MPI_Recv(&dato,1,MPI_BYTE,0,8,MPI_COMM_WORLD,&estado);
+
+			MPI_Send(&dato,1,MPI_BYTE,0,8,MPI_COMM_WORLD);
+		}	
+	}
+
+	operacion = 1;
+}
+if(operacion == 1) {
+
+//Calculamos tau
+if (myrank == 0)
+	{
+		for (i = 0; i<numit; i++)
+		{
+			start_time = MPI_Wtime();
+				
+				MPI_Send(&mensaje,1,MPI_DOUBLE,1,8,MPI_COMM_WORLD);
+				
+				MPI_Recv(&mensaje,1,MPI_DOUBLE,1,8,MPI_COMM_WORLD,&estado);
+
+				
+			
+			
+			
+			
+		}
+		end_time = MPI_Wtime();
+		tam = sizeof(mensaje); 
+		t_comm = (end_time - start_time)/(2*numit);
+
+		//Calculamos las medias...
+				
+		t_tau = ((t_comm - t_beta)/tam);
+
+		printf("El tiempo de comunicación total (tcom = b + t * tam) es: %f ms\n",t_comm * pow(10,6));
+		printf ("El parámetro beta son: %f ms\n",t_beta* pow(10,6));
+		printf("El parámetro tau son: %f ms/bytes\n",t_tau* pow(10,6));
+	}
+else
+{
+	for (i = 0; i<numit; i++)
+	{
+		MPI_Recv(&mensaje,1,MPI_DOUBLE,0,8,MPI_COMM_WORLD,&estado);
+		MPI_Send(&mensaje,1,MPI_DOUBLE,0,8,MPI_COMM_WORLD);
+	}
+		
+}
+}
+
+
+MPI_Finalize();
+
+
+
+
+
+}
+
+
