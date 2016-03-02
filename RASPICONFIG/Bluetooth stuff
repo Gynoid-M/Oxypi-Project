@@ -1,0 +1,16 @@
+rfcomm0 {
+        bind no;
+#
+#       # Bluetooth address of the device
+        #Pulsioximetro BerryMed
+        
+        device 8c:de:52:34:99:3b;
+#
+#       # RFCOMM channel for the connection
+        channel 6;
+#
+#       # Description of the connection
+        comment "Connection stablished";
+#
+}
+
